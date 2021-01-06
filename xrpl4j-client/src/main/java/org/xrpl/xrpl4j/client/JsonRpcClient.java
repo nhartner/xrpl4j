@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.Beta;
 import feign.Feign;
 import feign.Headers;
 import feign.RequestLine;
@@ -24,7 +25,10 @@ import java.util.Optional;
  * A feign HTTP client for interacting with the rippled JSON RPC API. This client is strictly responsible for
  * making network calls and deserializing responses. All higher order functionality such as signing and serialization
  * should be implemented in a wrapper class.
+ *
+ * Note: This client is currently marked as {@link Beta}, and should be used as a reference implementation ONLY.
  */
+@Beta
 public interface JsonRpcClient {
 
   Logger logger = LoggerFactory.getLogger(JsonRpcClient.class);
@@ -41,6 +45,7 @@ public interface JsonRpcClient {
    * Constructs a new client for the given url.
    *
    * @param rippledUrl url for the faucet server.
+   *
    * @return A {@link JsonRpcClient} that can make request to {@code rippledUrl}
    */
   static JsonRpcClient construct(final HttpUrl rippledUrl) {
@@ -59,6 +64,7 @@ public interface JsonRpcClient {
    * Send a POST request to the rippled server with {@code rpcRequest} in the request body.
    *
    * @param rpcRequest A rippled JSON RPC API request object.
+   *
    * @return A {@link JsonNode} which can be manually parsed containing the response.
    */
   @RequestLine("POST /")
@@ -73,14 +79,15 @@ public interface JsonRpcClient {
    *
    * @param request      The {@link JsonRpcRequest} to send to the server.
    * @param resultType   The type of {@link XrplResult} that should be returned.
-   * @param <ResultType> The extension of {@link XrplResult} corresponding to the request method.
-   * @return The {@link ResultType} representing the result of the request.
+   * @param <T> The extension of {@link XrplResult} corresponding to the request method.
+   *
+   * @return The {@link T} representing the result of the request.
    * @throws JsonRpcClientErrorException If rippled returns an error message, or if the response could not be
    *                                     deserialized to the provided {@link JsonRpcRequest} type.
    */
-  default <ResultType extends XrplResult> ResultType send(
+  default <T extends XrplResult> T send(
       JsonRpcRequest request,
-      Class<ResultType> resultType
+      Class<T> resultType
   ) throws JsonRpcClientErrorException {
     JavaType javaType = objectMapper.constructType(resultType);
     return send(request, javaType);
@@ -89,17 +96,18 @@ public interface JsonRpcClient {
   /**
    * Send a given request to rippled. Unlike {@link JsonRpcClient#send(JsonRpcRequest, Class)}, this
    * override requires a {@link JavaType} as the resultType, which can be useful when expecting a {@link XrplResult}
-   * with type parameters. In this case, you can use an {@link ObjectMapper}'s {@link com.fasterxml.jackson.databind.type.TypeFactory}
-   * to construct parameterized types.
+   * with type parameters. In this case, you can use an {@link ObjectMapper}'s
+   * {@link com.fasterxml.jackson.databind.type.TypeFactory} to construct parameterized types.
    *
    * @param request      The {@link JsonRpcRequest} to send to the server.
    * @param resultType   The type of {@link XrplResult} that should be returned, converted to a {@link JavaType}.
-   * @param <ResultType> The extension of {@link XrplResult} corresponding to the request method.
-   * @return The {@link ResultType} representing the result of the request.
+   * @param <T> The extension of {@link XrplResult} corresponding to the request method.
+   *
+   * @return The {@link T} representing the result of the request.
    * @throws JsonRpcClientErrorException If rippled returns an error message, or if the response could not be
    *                                     deserialized to the provided {@link JsonRpcRequest} type.
    */
-  default <ResultType extends XrplResult> ResultType send(
+  default <T extends XrplResult> T send(
       JsonRpcRequest request,
       JavaType resultType
   ) throws JsonRpcClientErrorException {
@@ -117,6 +125,7 @@ public interface JsonRpcClient {
    * Parse the response JSON to detect a possible error response message.
    *
    * @param response The {@link JsonNode} containing the JSON response from rippled.
+   *
    * @throws JsonRpcClientErrorException If rippled returns an error message.
    */
   default void checkForError(JsonNode response) throws JsonRpcClientErrorException {

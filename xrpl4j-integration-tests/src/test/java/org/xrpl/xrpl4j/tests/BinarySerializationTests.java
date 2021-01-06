@@ -11,6 +11,8 @@ import com.ripple.cryptoconditions.CryptoConditionReader;
 import com.ripple.cryptoconditions.der.DerEncodingException;
 import org.junit.jupiter.api.Test;
 import org.xrpl.xrpl4j.codec.binary.XrplBinaryCodec;
+import org.xrpl.xrpl4j.model.flags.Flags;
+import org.xrpl.xrpl4j.model.flags.Flags.PaymentFlags;
 import org.xrpl.xrpl4j.model.jackson.ObjectMapperFactory;
 import org.xrpl.xrpl4j.model.ledger.SignerEntry;
 import org.xrpl.xrpl4j.model.ledger.SignerEntryWrapper;
@@ -25,8 +27,6 @@ import org.xrpl.xrpl4j.model.transactions.DepositPreAuth;
 import org.xrpl.xrpl4j.model.transactions.EscrowCancel;
 import org.xrpl.xrpl4j.model.transactions.EscrowCreate;
 import org.xrpl.xrpl4j.model.transactions.EscrowFinish;
-import org.xrpl.xrpl4j.model.flags.Flags;
-import org.xrpl.xrpl4j.model.flags.Flags.PaymentFlags;
 import org.xrpl.xrpl4j.model.transactions.Hash256;
 import org.xrpl.xrpl4j.model.transactions.IssuedCurrencyAmount;
 import org.xrpl.xrpl4j.model.transactions.OfferCancel;
@@ -366,7 +366,7 @@ public class BinarySerializationTests {
         .account(Address.of("rJMiz2rCMjZzEMijXNH1exNBryTQEjFd9S"))
         .fee(XrpCurrencyAmount.ofDrops(12))
         .flags(Flags.TrustSetFlags.builder()
-            .tfSetNoRipple(true)
+            .tfSetNoRipple()
             .tfFullyCanonicalSig(false)
             .build())
         .sequence(UnsignedInteger.valueOf(44))
@@ -391,7 +391,7 @@ public class BinarySerializationTests {
         .account(Address.of("rUx4xgE7bNWCCgGcXv1CCoQyTcCeZ275YG"))
         .sequence(UnsignedInteger.valueOf(11223344))
         .offerSequence(UnsignedInteger.valueOf(123))
-        .flags(Flags.OfferFlags.builder().tfFullyCanonicalSig(true).tfSell(true).build())
+        .flags(Flags.OfferCreateFlags.builder().tfFullyCanonicalSig(true).tfSell(true).build())
         .expiration(UnsignedInteger.valueOf(456))
         .build();
 
