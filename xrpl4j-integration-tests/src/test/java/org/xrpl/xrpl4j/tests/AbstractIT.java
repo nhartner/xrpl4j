@@ -73,8 +73,17 @@ public abstract class AbstractIT {
    * @param wallet The {@link Wallet} to fund.
    */
   protected void fundAccount(Wallet wallet) {
-    xrplEnvironment.fundAccount(wallet.classicAddress());
+    fundAddress(wallet.classicAddress());
   }
+
+  /**
+   * Funds an address with 1000 XRP.
+   * @param wallet
+   */
+  protected void fundAddress(Address address) {
+    xrplEnvironment.fundAccount(address);
+  }
+
 
   //////////////////////
   // Ledger Helpers
